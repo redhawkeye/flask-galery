@@ -11,7 +11,22 @@
 </head>
 
 <body>
-    <center><h1>Welcome {{ username }} | <a href="/logout">Logout</a></h1></center>
+    <center>
+        <h1>Welcome {{ username }} | <a class="trigger_popup_fricc">Upload</a> | <a href="/logout">Logout</a></h1>
+        <div class="hover_bkgr_fricc">
+            <span class="helper"></span>
+            <div>
+                <div class="popupCloseButton">&times;</div>
+                <h2>Upload File</h2>
+                <form action="/upload" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="file" class="form-control" name="fileToUpload" id="fileToUpload">
+                    </div>
+                    <button type="submit" class="btn btn-success">Upload</button>
+                </form>
+            </div>
+        </div>
+    </center>
     <div class="container">
         <div class="row">
             <div class="gallery">
@@ -32,46 +47,7 @@
 			s0.292,0.773,0,1.068l-2.505,2.528L12.491,11.491z" />
                 </symbol>
             </svg>
-
-            <script>
-                popup = {
-                    init: function () {
-                        $('figure').click(function () {
-                            popup.open($(this));
-                        });
-
-                        $(document).on('click', '.popup img', function () {
-                            return false;
-                        }).on('click', '.popup', function () {
-                            popup.close();
-                        })
-                    },
-
-                    open: function ($figure) {
-                        $('.gallery').addClass('pop');
-                        $popup = $('<div class="popup" />').appendTo($('body'));
-                        $fig = $figure.clone().appendTo($('.popup'));
-                        $bg = $('<div class="bg" />').appendTo($('.popup'));
-                        $close = $('<div class="close"><svg><use xlink:href="#close"></use></svg></div>').appendTo($fig);
-                        $shadow = $('<div class="shadow" />').appendTo($fig);
-                        src = $('img', $fig).attr('src');
-                        $shadow.css({ backgroundImage: 'url(' + src + ')' });
-                        $bg.css({ backgroundImage: 'url(' + src + ')' });
-                        setTimeout(function () {
-                            $('.popup').addClass('pop');
-                        }, 10);
-                    },
-
-                    close: function () {
-                        $('.gallery, .popup').removeClass('pop');
-                        setTimeout(function () {
-                            $('.popup').remove()
-                        }, 100);
-                    }
-                }
-
-                popup.init()
-            </script>
+            <script src="static/js/script.js"></script>
         </div>
     </div>
 </body>

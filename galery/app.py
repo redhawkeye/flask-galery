@@ -193,12 +193,14 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
-@app.route('/galery')
-def galery():
-    response = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME, Prefix=S3_FOLDER_NAME)
-    objects = response.get('Contents', [])
-    file_names = [obj['Key'] for obj in objects if obj['Key'] != 'images/']
-    return render_template('galery.html', username=session["username"], file_names=file_names)
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    print('Test upload')
+    return 'Test upload'
+    # response = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME, Prefix=S3_FOLDER_NAME)
+    # objects = response.get('Contents', [])
+    # file_names = [obj['Key'] for obj in objects if obj['Key'] != 'images/']
+    # return render_template('index.html', username=session["username"], file_names=file_names)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', use_reloader=True, port=8800)
