@@ -23,7 +23,7 @@ jobs:
           name: Build image
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin $DOCKER_REGISTRY
-            docker build -t $DOCKER_REGISTRY/$REGISTRY_USER/flask-galery:latest -f Dockerfile .
+            docker build -t $DOCKER_REGISTRY/$REGISTRY_USER/flask-galery:latest . -f Dockerfile
             docker push $DOCKER_REGISTRY/$REGISTRY_USER/flask-galery:latest
 
 workflows:
