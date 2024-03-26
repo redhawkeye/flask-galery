@@ -5,9 +5,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: 'sawitpro/galery:latest'
+    image: 'ghcr.io/redhawkeye/flask-galery:latest'
     restart: always
     tmpfs:
+      - /var/tmp:noexec,nosuid,nodev
       - /tmp:noexec,nosuid,nodev
     ports:
       - 0.0.0.0:8800:8800
@@ -22,6 +23,7 @@ services:
     hostname: mysql.local
     restart: always
     tmpfs:
+      - /var/tmp:noexec,nosuid,nodev
       - /tmp:noexec,nosuid,nodev
     ports:
       - 0.0.0.0:3306:3306

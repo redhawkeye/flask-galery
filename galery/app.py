@@ -115,16 +115,17 @@ def login():
             md5pas = str2md5(password)
             md5salt = str2md5(salt)
             pasandsalt = '{}.{}'.format(md5pas, md5salt)
-        except:
-            captcha_value = generate_captcha()
-            session['captcha_value'] = captcha_value
-            error = 'Username, password, or captcha is incorrect'
-            return render_template('login.html', form=form, error=error, captcha_value=generate_images(captcha_value))
 
-        if username == usrs and bcrypt.checkpw(pasandsalt.encode('utf-8'), hash.encode('utf-8')) == True and captcha == captcha_value:
-            session["username"] = username
-            return redirect(url_for('index'))
-        else:
+            if username == usrs and bcrypt.checkpw(pasandsalt.encode('utf-8'), hash.encode('utf-8')) == True and captcha == captcha_value:
+                session["username"] = username
+                return redirect(url_for('index'))
+            else:
+                captcha_value = generate_captcha()
+                session['captcha_value'] = captcha_value
+                error = 'Username, password, or captcha is incorrect'
+                return render_template('login.html', form=form, error=error, captcha_value=generate_images(captcha_value))
+
+        except:
             captcha_value = generate_captcha()
             session['captcha_value'] = captcha_value
             error = 'Username, password, or captcha is incorrect'
@@ -163,7 +164,7 @@ def register():
             query = "SELECT unam FROM creds WHERE unam = %s"
             cursor.execute(query, [username])
             usrs = cursor.fetchone()
-            if captcha == session['captcha_value'] and usrs == False:
+            if captcha == session['captcha_value'] and usrs == None:
                 query = "INSERT INTO creds (fnam, lnam, unam, hash, salt, ctim, utim, rol) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
                 values = (firstname, lastname, username, enhash.decode(), salt, ctim, ctim, 1)
                 cursor.execute(query, values)
