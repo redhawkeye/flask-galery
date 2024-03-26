@@ -1,0 +1,6 @@
+flask
+flask_wtf
+Pillow
+boto3
+python-dotenv
+mysql-connector-python
