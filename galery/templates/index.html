@@ -12,18 +12,17 @@
 
 <body>
     <center>
-        <h1>Welcome {{ username }} | <a class="trigger_popup_fricc">Upload</a> | <a href="/logout">Logout</a></h1>
+        <h1>Welcome {{ username }} <a class="btn btn-success trigger_popup_fricc" role="button">Upload</a> <a class="btn btn-danger" role="button" href="/logout">Logout</a></h1>
         <div class="hover_bkgr_fricc">
             <span class="helper"></span>
             <div>
                 <div class="popupCloseButton">&times;</div>
                 <h2>Upload File</h2>
-                <form action="/upload" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <input type="file" class="form-control" name="fileToUpload" id="fileToUpload">
-                    </div>
-                    <button type="submit" class="btn btn-success">Upload</button>
-                </form>
+                <div class="form-group">
+                    {{ form.csrf_token }}
+                    <input type="file" class="form-control" name="fileToUpload" id="fileToUpload">
+                </div>
+                <button onclick="uploadFile()" class="btn btn-success">Upload</button>
             </div>
         </div>
     </center>

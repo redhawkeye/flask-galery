@@ -1,6 +1,7 @@
 from flask import *
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect, CSRFError
+from flask_wtf.file import FileField, FileRequired
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Length
 from PIL import Image, ImageDraw, ImageFont
@@ -11,8 +12,10 @@ import hashlib, bcrypt, time, re
 env_vars = dotenv_values('.env')
 app = Flask(__name__)
 app.secret_key = env_vars['FLASK_SECRET']
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # Max upload/request 2mb
 csrf = CSRFProtect(app)
 
+ALLOWED_EXTENSIONS = {'image/png', 'image/jpeg', 'image/gif'}
 AWS_ACCESS_KEY_ID = env_vars['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = env_vars['AWS_SECRET_ACCESS_KEY']
 AWS_REGION = env_vars['AWS_REGION']
@@ -39,6 +42,9 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
     captcha = StringField('Captcha', validators=[DataRequired()])
 
+class UploadForm(FlaskForm):
+    file = FileField('Upload File', validators=[FileRequired()])
+
 def generate_captcha():
     captcha_value = str(random.randint(100000, 999999))
     return captcha_value
@@ -62,6 +68,7 @@ def generate_images(captcha_value):
 def str2md5(strg):
     return hashlib.md5(str(strg).encode()).hexdigest()
 
+# Handle SQL injection
 def sqlif(input_string):
     sql_keywords = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'DROP', 'TRUNCATE', 'ALTER', 'CREATE', 'JOIN', 'UNION', 'INTO', 'FROM', 'WHERE', 'OR', 'AND']
     input_lower = input_string.lower()    
@@ -85,10 +92,27 @@ def handle_csrf_error(e):
 
 @app.route('/')
 def index():
+    form = UploadForm()
     response = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME, Prefix=S3_FOLDER_NAME)
     objects = response.get('Contents', [])
     file_names = [obj['Key'] for obj in objects if obj['Key'] != 'images/']
-    return render_template('index.html', username=session["username"], file_names=file_names)
+    return render_template('index.html', form=form, username=session["username"], file_names=file_names)
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    form = UploadForm()
+    if form.validate_on_submit():
+        file = form.file.data
+        if file.content_type not in ALLOWED_EXTENSIONS: # Filter file type
+            return Response(f'File type not allowed')
+        else:
+            filename = generate_captcha() + '_' + file.filename
+            print(filename)
+            s3_client.upload_fileobj(file, S3_BUCKET_NAME, S3_FOLDER_NAME + '/' + filename)
+            s3_client.put_object_acl(Bucket=S3_BUCKET_NAME, Key=S3_FOLDER_NAME + '/' + filename, ACL='public-read')
+            return Response(f'Successfully uploaded file')
+    else:
+        return Response(f'Upload failed')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -116,6 +140,7 @@ def login():
             md5salt = str2md5(salt)
             pasandsalt = '{}.{}'.format(md5pas, md5salt)
 
+            # Login with secure hashing
             if username == usrs and bcrypt.checkpw(pasandsalt.encode('utf-8'), hash.encode('utf-8')) == True and captcha == captcha_value:
                 session["username"] = username
                 return redirect(url_for('index'))
@@ -192,15 +217,6 @@ def register():
 def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload():
-    print('Test upload')
-    return 'Test upload'
-    # response = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME, Prefix=S3_FOLDER_NAME)
-    # objects = response.get('Contents', [])
-    # file_names = [obj['Key'] for obj in objects if obj['Key'] != 'images/']
-    # return render_template('index.html', username=session["username"], file_names=file_names)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', use_reloader=True, port=8800)

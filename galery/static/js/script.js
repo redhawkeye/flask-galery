@@ -1,3 +1,23 @@
+function uploadFile() {
+    var fileInput = document.getElementById('fileToUpload');
+    var file = fileInput.files[0];
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('csrf_token', document.getElementById('csrf_token').value);
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/upload', true);
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            alert(xhr.responseText);
+            location.reload();
+        } else {
+            alert(xhr.responseText);
+            location.reload();
+        }
+    };
+    xhr.send(formData);
+}
+
 $(window).load(function () {
     $(".trigger_popup_fricc").click(function () {
         $('.hover_bkgr_fricc').show();
