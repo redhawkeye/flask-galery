@@ -1,0 +1,36 @@
+version: 2.1
+
+executors:
+  docker:
+    docker:
+      - image: cimg/base:stable
+
+jobs:
+  hadolint:
+    executor: docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Checking Dockerfile code quality
+          command: docker run --rm -i ghcr.io/hadolint/hadolint:latest < Dockerfile || true
+  build-image:
+    executor: docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build image
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin $DOCKER_REGISTRY
+            docker build --tag $DOCKER_REGISTRY/$REGISTRY_USER/flask-galery:latest -f Dockerfile .
+            docker push $DOCKER_REGISTRY/$REGISTRY_USER/flask-galery:latest
+
+workflows:
+  version: 2
+  build-image:
+    jobs:
+      - hadolint
+      - build-image:
+          requires:
+            - hadolint
