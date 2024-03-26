@@ -104,7 +104,7 @@ def index():
     response = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME, Prefix=S3_FOLDER_NAME)
     objects = response.get('Contents', [])
     file_names = [obj['Key'] for obj in objects if obj['Key'] != 'images/']
-    return render_template('index.html', form=form, username=session["username"], file_names=file_names)
+    return render_template('index.html', form=form, bucket_name=S3_BUCKET_NAME, region=AWS_REGION, username=session["username"], file_names=file_names)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():

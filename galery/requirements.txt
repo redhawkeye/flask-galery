@@ -1,6 +1,7 @@
 flask
 flask_wtf
 Pillow
+bcrypt
 boto3
 python-dotenv
 mysql-connector-python
