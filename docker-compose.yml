@@ -1,5 +1,23 @@
 version: '3.8'
 services:
+  modsecurity:
+    image: 'owasp/modsecurity-crs:apache'
+    hostname: modsecurity.local
+    restart: always
+    ports:
+      - 0.0.0.0:80:80
+    tmpfs:
+      - /var/tmp:noexec,nosuid,nodev
+      - /tmp:noexec,nosuid,nodev
+    environment:
+      - BACKEND=${BACKEND:-http://10.0.0.100:8800}
+      - BACKEND_WS=${BACKEND_WS:-ws://10.0.0.100:8800}
+    depends_on:
+      - galery
+    networks:
+      devel:
+        ipv4_address: 10.0.0.11
+
   galery:
     hostname: galery.local
     build:
@@ -7,11 +25,11 @@ services:
       dockerfile: Dockerfile
     image: 'ghcr.io/redhawkeye/flask-galery:latest'
     restart: always
+    depends_on:
+      - mysql
     tmpfs:
       - /var/tmp:noexec,nosuid,nodev
       - /tmp:noexec,nosuid,nodev
-    ports:
-      - 0.0.0.0:8800:8800
     volumes:
       - ./galery:/app
     networks:
@@ -25,8 +43,6 @@ services:
     tmpfs:
       - /var/tmp:noexec,nosuid,nodev
       - /tmp:noexec,nosuid,nodev
-    ports:
-      - 0.0.0.0:3306:3306
     environment:
       - MYSQL_DATABASE=${DBNAME:-sawitpro}
       - MYSQL_USER=${DBUSER:-sawitpro}
