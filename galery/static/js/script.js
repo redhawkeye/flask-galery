@@ -1,3 +1,24 @@
+function deleteFile(file_name) {
+    var result = window.confirm("Are you sure want to delete this file?");
+    if (result) {
+        var formData = new FormData();
+        formData.append('file', file_name);
+        formData.append('csrf_token', document.getElementById('csrf_token').value);
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/delete', true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                alert(xhr.responseText);
+                location.reload();
+            } else {
+                alert(xhr.responseText);
+                location.reload();
+            }
+        };
+        xhr.send(formData);
+    }
+}
+
 function uploadFile() {
     var fileInput = document.getElementById('fileToUpload');
     var file = fileInput.files[0];

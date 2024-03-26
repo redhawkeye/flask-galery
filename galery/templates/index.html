@@ -31,8 +31,8 @@
             <div class="gallery">
                 {% for file_name in file_names %}
                 <figure>
-                    <img src="http://sawitpro.s3-website-ap-southeast-1.amazonaws.com/{{ file_name }}" alt="" />
-                    <figcaption>Fruit <small>From indonesia</small></figcaption>
+                    <img style="width: 100%" src="http://sawitpro.s3-website-ap-southeast-1.amazonaws.com/{{ file_name }}" alt="" />
+                    <figcaption><button class="btn btn-danger" onclick="deleteFile('{{ file_name }}')">Delete</button></figcaption>
                 </figure>
                 {% endfor %}
             </div>

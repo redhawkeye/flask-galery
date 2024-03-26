@@ -6,6 +6,7 @@ from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Length
 from PIL import Image, ImageDraw, ImageFont
 from dotenv import dotenv_values
+from werkzeug.exceptions import RequestEntityTooLarge
 import io, base64, random, boto3, mysql.connector
 import hashlib, bcrypt, time, re
 
@@ -44,6 +45,9 @@ class RegisterForm(FlaskForm):
 
 class UploadForm(FlaskForm):
     file = FileField('Upload File', validators=[FileRequired()])
+
+class DeleteForm(FlaskForm):
+    file = StringField('Delete File', validators=[DataRequired()])
 
 def generate_captcha():
     captcha_value = str(random.randint(100000, 999999))
@@ -90,6 +94,10 @@ def before_req():
 def handle_csrf_error(e):
     return redirect(request.referrer)
 
+@app.errorhandler(RequestEntityTooLarge)
+def handle_request_entity_too_large(error):
+    return 'File too large. Maximum file size is 2MB', 413
+
 @app.route('/')
 def index():
     form = UploadForm()
@@ -107,12 +115,21 @@ def upload():
             return Response(f'File type not allowed')
         else:
             filename = generate_captcha() + '_' + file.filename
-            print(filename)
             s3_client.upload_fileobj(file, S3_BUCKET_NAME, S3_FOLDER_NAME + '/' + filename)
             s3_client.put_object_acl(Bucket=S3_BUCKET_NAME, Key=S3_FOLDER_NAME + '/' + filename, ACL='public-read')
             return Response(f'Successfully uploaded file')
     else:
         return Response(f'Upload failed')
+
+@app.route('/delete', methods=['GET', 'POST'])
+def delete():
+    form = DeleteForm()
+    if form.validate_on_submit():
+        file = form.file.data
+        s3_client.delete_object(Bucket=S3_BUCKET_NAME, Key=file)
+        return Response(f'Successfully delete file')
+    else:
+        return Response(f'Delete file failed')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

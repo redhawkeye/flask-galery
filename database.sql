@@ -11,4 +11,4 @@ CREATE TABLE `creds` (
   PRIMARY KEY (`idn`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO creds (fnam,lnam,hash,salt,ctim,utim,rol,unam) VALUES ('Budi','Komarudin','$2a$10$bwCmhcEFiXrEnUFxHXuxn.ncgsnSSN6rpFv7PfSFjpYvsFrROqsMa',137137,1711349116,1711349116,0,'admin');
+INSERT INTO creds (fnam,lnam,hash,salt,ctim,utim,rol,unam) VALUES ('Galery','Admin','$2a$10$bwCmhcEFiXrEnUFxHXuxn.ncgsnSSN6rpFv7PfSFjpYvsFrROqsMa',137137,1711349116,1711349116,0,'admin');
