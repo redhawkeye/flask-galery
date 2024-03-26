@@ -1,23 +1,5 @@
 version: '3.8'
 services:
-  modsecurity:
-    image: 'owasp/modsecurity-crs:apache'
-    hostname: modsecurity.local
-    restart: always
-    ports:
-      - 0.0.0.0:80:80
-    tmpfs:
-      - /var/tmp:noexec,nosuid,nodev
-      - /tmp:noexec,nosuid,nodev
-    environment:
-      - BACKEND=${BACKEND:-http://10.0.0.100:8800}
-      - BACKEND_WS=${BACKEND_WS:-ws://10.0.0.100:8800}
-    depends_on:
-      - galery
-    networks:
-      devel:
-        ipv4_address: 10.0.0.11
-
   galery:
     hostname: galery.local
     build:
@@ -25,6 +7,8 @@ services:
       dockerfile: Dockerfile
     image: 'ghcr.io/redhawkeye/flask-galery:latest'
     restart: always
+    ports:
+      - 0.0.0.0:80:8800
     depends_on:
       - mysql
     tmpfs:
@@ -49,6 +33,7 @@ services:
       - MYSQL_PASSWORD=${DBPASS:-SuperSecretPassword}
       - MYSQL_ROOT_PASSWORD=${DBROOTPASS:-SuperSecretRootPassword}
     volumes:
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql
       - mysql:/var/lib/mysql
     networks:
       devel:
