@@ -1,4 +1,4 @@
-FROM gcr.io/distroless/python3-debian11:nonroot-arm64
+FROM gcr.io/distroless/python3-debian11:nonroot
 COPY galery /app
 COPY get-pip.py /get-pip.py
 RUN python /get-pip.py
