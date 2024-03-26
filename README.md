@@ -2,6 +2,13 @@
 
 This is a simple Flask galery application that is containerized using Docker and AWS S3 as a storage.
 
+# Proof
+![Login](.github/images/login.png)
+![Register](.github/images/register.png)
+![Index](.github/images/index.png)
+![Upload](.github/images/upload.png)
+![Delete](.github/images/delete.png)
+
 ## Installation
 
 Follow the steps below to install and run the application.
